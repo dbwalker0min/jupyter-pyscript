@@ -1,0 +1,25 @@
+# Prevent secrets and local state from ever entering the build context
+.env
+.env.*
+
+# Local runtime config (mounted at runtime, not baked into the image)
+pyscript/pyscript.conf
+
+# Local notebooks + Jupyter runtime data
+notebooks/
+jupyter-data/
+
+# VCS / editor / OS junk
+.git/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Docker compose overrides
+docker-compose.override.yml

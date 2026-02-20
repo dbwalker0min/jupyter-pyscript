@@ -1,8 +1,10 @@
+name: jupyter-pyscript
+
 services:
   jupyter:
     build:
       context: .
-    image: dbwalker0min/jupyter-pyscript:latest
+    image: dbwalker/jupyter-pyscript:latest
     ports:
       - "8888:8888"
     volumes:

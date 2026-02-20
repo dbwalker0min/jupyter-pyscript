@@ -6,8 +6,29 @@ This image bundles Jupyter Notebook/Lab, PyScript tooling, the `python-lsp-serve
 
 ```powershell
 # from this folder
-docker build -t jupyter-pyscript .
+docker build -t dbwalker/jupyter-pyscript:latest .
 ```
+
+## Push to a registry (Docker Hub)
+
+```powershell
+# If `docker login` succeeds instantly, you might already have cached credentials.
+# If you get `insufficient_scope` on push, do a clean login:
+docker logout
+docker login -u dbwalker
+
+# Build/tag (if you didn't already)
+docker build -t dbwalker/jupyter-pyscript:latest .
+
+# Push
+docker push dbwalker/jupyter-pyscript:latest
+```
+
+Notes:
+
+- Ensure `dbwalker` is your **Docker Hub** username/namespace.
+- Create the `jupyter-pyscript` repository on Docker Hub first if your account/org requires it.
+- If you have 2FA enabled, use a Docker Hub Personal Access Token as the password.
 
 ## Run with Docker Compose (recommended)
 
