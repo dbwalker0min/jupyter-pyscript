@@ -1,0 +1,7 @@
+notebook
+jupyterlab
+jupyterlab-lsp
+python-lsp-server[all]
+pyscript
+homeassistant-stubs
+voluptuous
