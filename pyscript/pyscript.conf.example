@@ -1,0 +1,12 @@
+[homeassistant]
+# Hostname or IP of your Home Assistant instance
+hass_host = homeassistant.local
+
+# Base URL for Home Assistant API
+hass_url = http://homeassistant.local:8123/
+
+# Long-lived access token from your Home Assistant user profile
+hass_token = REPLACE_WITH_LONG_LIVED_ACCESS_TOKEN
+
+# Optional proxy URL (for example: socks5://127.0.0.1:1080)
+hass_proxy =

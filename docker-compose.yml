@@ -1,0 +1,15 @@
+services:
+  jupyter:
+    build:
+      context: .
+    image: dbwalker0min/jupyter-pyscript:latest
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./jupyter-data:/home/jovyan/.local/share/jupyter
+      - ./pyscript/pyscript.conf:/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf:ro
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped
