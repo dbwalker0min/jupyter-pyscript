@@ -4,6 +4,7 @@
 
 # Local runtime config (mounted at runtime, not baked into the image)
 pyscript/pyscript.conf
+pyscript_conf/pyscript.conf
 
 # Local notebooks + Jupyter runtime data
 notebooks/

@@ -5,12 +5,14 @@ services:
     build:
       context: .
     image: dbwalker/jupyter-pyscript:latest
+    environment:
+      - PYTHONPATH=/home/jovyan/work/modules
     ports:
       - "8888:8888"
     volumes:
       - ./notebooks:/home/jovyan/work
       - ./jupyter-data:/home/jovyan/.local/share/jupyter
-      - ./pyscript/pyscript.conf:/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf:ro
+      - ./pyscript_conf/pyscript.conf:/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf:ro
     env_file:
       - path: .env
         required: false

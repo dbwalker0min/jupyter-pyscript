@@ -30,6 +30,33 @@ Notes:
 - Create the `jupyter-pyscript` repository on Docker Hub first if your account/org requires it.
 - If you have 2FA enabled, use a Docker Hub Personal Access Token as the password.
 
+## `notebooks/modules/` (type hints + third-party packages)
+
+This setup uses a `./notebooks/modules` directory for local code, stub packages, and optional third-party installs.
+
+- `./notebooks` is mounted into the container at `/home/jovyan/work`
+- `docker-compose.yml` sets `PYTHONPATH=/home/jovyan/work/modules`
+
+That means both:
+
+- Python in notebooks can `import ...` from `modules/`
+- JupyterLab's Python LSP (`python-lsp-server`) can resolve those imports for autocomplete/type hints
+
+### Installing packages into `modules/`
+
+From a notebook:
+
+```python
+%pip install --target modules <package>
+```
+
+Or from a shell in the running container:
+
+```powershell
+docker compose exec jupyter bash
+python -m pip install --target /home/jovyan/work/modules <package>
+```
+
 ## Run with Docker Compose (recommended)
 
 ```powershell
@@ -37,17 +64,21 @@ Notes:
 Copy-Item .env.example .env
 
 # required for pyscript kernel: add your Home Assistant settings + token
-Copy-Item .\pyscript\pyscript.conf.example .\pyscript\pyscript.conf
+Copy-Item .\pyscript_conf\pyscript.conf.example .\pyscript_conf\pyscript.conf
 
 # start in background
 docker compose up --build -d
+
+# If you changed environment variables (e.g. PYTHONPATH) and they're not showing up,
+# recreate the container:
+# docker compose up --build -d --force-recreate
 ```
 
 This setup mounts:
 
 - `./notebooks` -> `/home/jovyan/work` (your notebooks)
 - `./jupyter-data` -> `/home/jovyan/.local/share/jupyter` (Jupyter user data)
-- `./pyscript/pyscript.conf` -> `/usr/local/share/jupyter/kernels/pyscript/pyscript.conf` (Home Assistant connection + token)
+- `./pyscript_conf/pyscript.conf` -> `/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf` (Home Assistant connection + token, mounted read-only)
 
 Then open `http://localhost:8888` in your browser.
 
@@ -65,9 +96,11 @@ docker compose down
 
 ## Run with Docker
 
+Use the fully-qualified image name to pull from Docker Hub (recommended for other machines): `dbwalker/jupyter-pyscript:latest`.
+
 ```powershell
 # map port 8888 and mount your notebooks directory
-docker run --rm -it -p 8888:8888 -v ${PWD}/notebooks:/home/jovyan/work -v ${PWD}/jupyter-data:/home/jovyan/.local/share/jupyter -v ${PWD}/pyscript/pyscript.conf:/usr/local/share/jupyter/kernels/pyscript/pyscript.conf:ro jupyter-pyscript
+docker run --rm -it -p 8888:8888 -e PYTHONPATH=/home/jovyan/work/modules -v ${PWD}/notebooks:/home/jovyan/work -v ${PWD}/jupyter-data:/home/jovyan/.local/share/jupyter -v ${PWD}/pyscript_conf/pyscript.conf:/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf:ro dbwalker/jupyter-pyscript:latest
 ```
 
 Then open `http://localhost:8888` in your browser.
@@ -81,7 +114,7 @@ docker logs <container-id>
 To set your own token at runtime:
 
 ```powershell
-docker run --rm -it -p 8888:8888 -e JUPYTER_TOKEN=mytoken jupyter-pyscript
+docker run --rm -it -p 8888:8888 -e PYTHONPATH=/home/jovyan/work/modules -e JUPYTER_TOKEN=mytoken dbwalker/jupyter-pyscript:latest
 ```
 
 To use a password, pass a **hashed** value (recommended):
@@ -91,13 +124,13 @@ To use a password, pass a **hashed** value (recommended):
 python -c "from jupyter_server.auth import passwd; print(passwd())"
 
 # run container with hashed password
-docker run --rm -it -p 8888:8888 -e JUPYTER_PASSWORD='<paste-hash>' jupyter-pyscript
+docker run --rm -it -p 8888:8888 -e PYTHONPATH=/home/jovyan/work/modules -e JUPYTER_PASSWORD='<paste-hash>' dbwalker/jupyter-pyscript:latest
 ```
 
 Only disable auth intentionally (local trusted machine only):
 
 ```powershell
-docker run --rm -it -p 8888:8888 -e JUPYTER_TOKEN='' -e JUPYTER_PASSWORD='' jupyter-pyscript
+docker run --rm -it -p 8888:8888 -e PYTHONPATH=/home/jovyan/work/modules -e JUPYTER_TOKEN='' -e JUPYTER_PASSWORD='' dbwalker/jupyter-pyscript:latest
 ```
 
 ## Customizing
@@ -105,4 +138,4 @@ docker run --rm -it -p 8888:8888 -e JUPYTER_TOKEN='' -e JUPYTER_PASSWORD='' jupy
 - Add more pip packages by editing `requirements.txt` and rebuilding.
 - Change the default command (Notebook vs Lab) by tweaking the `CMD` line in `Dockerfile`.
 - Persist notebooks by binding a host directory to `/home/jovyan/work`.
-- Edit `pyscript/pyscript.conf` to point to your Home Assistant host, URL, and long-lived token.
+- Edit `pyscript_conf/pyscript.conf` to point to your Home Assistant host, URL, and long-lived token.

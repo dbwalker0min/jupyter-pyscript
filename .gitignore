@@ -1,4 +1,7 @@
 .env
 pyscript/pyscript.conf
+pyscript_conf/pyscript.conf
 jupyter-data/**
-notebooks
+notebooks/**
+!notebooks/.keep
+!notebooks/modules/.keep
